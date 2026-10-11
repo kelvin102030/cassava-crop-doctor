@@ -148,12 +148,18 @@ Make clear that this is a preliminary AI assessment, not a confirmed diagnosis.
             }), 429
         if response.status_code in (400, 403, 404):
             app.logger.warning(
-                "AI provider returned HTTP %s", response.status_code
+                "AI provider returned HTTP %s; response: %s",
+                response.status_code,
+                response.text[:500],
             )
             return jsonify({
                 "error": "The AI model or API configuration needs checking."
             }), 502
-        app.logger.warning("AI provider returned HTTP %s", response.status_code)
+        app.logger.warning(
+            "AI provider returned HTTP %s; response: %s",
+            response.status_code,
+            response.text[:500],
+        )
         return jsonify({"error": "The AI assessment failed. Please try later."}), 502
 
     try:
