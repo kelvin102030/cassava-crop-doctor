@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#174c2d">
+  <title>Cassava Crop Doctor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand-icon">🌿</div>
+    <div>
+      <h1>Cassava Crop Doctor</h1>
+      <p>Your cassava health assistant</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <span class="eyebrow">FARMER'S TOOLKIT</span>
+      <h2>Keep your cassava healthy.</h2>
+      <p>Take a clear photo of a cassava leaf to prepare it for disease assessment.</p>
+      <div class="notice">
+        <strong>Prototype stage</strong>
+        <p>AI diagnosis is not connected yet. This version prepares your photo but does not identify diseases.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Check a cassava leaf</h2>
+      <p class="muted">Choose a photo from your phone or take a new one.</p>
+
+      <label class="upload" for="leafPhoto">
+        <span class="camera">📷</span>
+        <strong>Choose leaf photo</strong>
+        <span>Use a clear, well-lit picture</span>
+      </label>
+      <input id="leafPhoto" type="file" accept="image/*" capture="environment">
+
+      <img id="preview" alt="Selected cassava leaf preview" hidden>
+
+      <label for="symptoms">What have you noticed?</label>
+      <select id="symptoms">
+        <option value="">Select an observation</option>
+        <option>Yellowing leaves</option>
+        <option>Brown or dead patches</option>
+        <option>Mosaic patterns or mottling</option>
+        <option>Curled or twisted leaves</option>
+        <option>Wilting or stunted growth</option>
+        <option>Insects or visible pests</option>
+        <option>Other or unsure</option>
+      </select>
+
+      <label for="location">Farm location (optional)</label>
+      <input id="location" type="text" placeholder="e.g. Ibadan, Oyo State">
+
+      <button id="prepareBtn" type="button">Prepare assessment</button>
+      <p id="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel tips">
+      <h2>Photo tips</h2>
+      <ul>
+        <li>Photograph the affected leaf clearly.</li>
+        <li>Use daylight and avoid blurry pictures.</li>
+        <li>Include the whole leaf and visible symptoms.</li>
+        <li>If possible, take photos of both healthy and affected leaves.</li>
+      </ul>
+    </section>
+
+    <p class="safety">Do not apply pesticides based on this prototype. Confirm suspected diseases with an agricultural extension officer before treatment.</p>
+  </main>
+
+  <footer>Built for cassava farmers · Early development version</footer>
+  <script src="app.js"></script>
+</body>
+</html>

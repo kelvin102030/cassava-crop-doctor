@@ -1,0 +1,58 @@
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #203328;
+  background: #f3f7f1;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  background: #174c2d;
+  color: white;
+}
+.brand-icon { font-size: 34px; }
+h1 { font-size: 19px; margin: 0; }
+.top p { margin: 4px 0 0; font-size: 13px; color: #dcebdd; }
+main { width: min(100% - 28px, 620px); margin: 22px auto; }
+.welcome { padding: 8px 3px 20px; }
+.eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #38764a; }
+h2 { font-size: 21px; margin: 9px 0; }
+.welcome > p, .muted { color: #627166; line-height: 1.55; font-size: 14px; }
+.notice {
+  margin-top: 18px; padding: 13px 15px; border-radius: 12px;
+  background: #fff4d9; border: 1px solid #ead69d; font-size: 13px;
+}
+.notice p { margin: 5px 0 0; line-height: 1.5; }
+.panel {
+  background: white; border: 1px solid #e2e9df; border-radius: 17px;
+  padding: 19px; margin-bottom: 17px; box-shadow: 0 4px 15px #193b1710;
+}
+.panel h2 { margin-top: 0; }
+.upload {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 24px 12px; margin: 17px 0; border: 2px dashed #9bb8a0;
+  border-radius: 13px; background: #f6faf5; text-align: center; cursor: pointer;
+}
+.camera { font-size: 33px; }
+.upload span:last-child { color: #69796c; font-size: 12px; }
+#leafPhoto { position: absolute; width: 1px; height: 1px; opacity: 0; }
+#preview { width: 100%; max-height: 300px; object-fit: contain; border-radius: 12px; margin: 0 0 17px; background: #edf2eb; }
+label:not(.upload) { display: block; font-size: 13px; font-weight: 700; margin: 16px 0 7px; }
+select, input[type="text"] {
+  width: 100%; padding: 13px; border: 1px solid #ccd7cc;
+  border-radius: 10px; background: white; color: #203328; font: inherit; font-size: 14px;
+}
+button {
+  width: 100%; margin-top: 20px; padding: 14px; border: 0;
+  border-radius: 10px; background: #1b6939; color: white;
+  font: inherit; font-weight: 750; cursor: pointer;
+}
+button:active { transform: scale(.99); }
+#message { font-size: 13px; line-height: 1.5; }
+.tips li { margin: 10px 0; color: #526356; font-size: 14px; line-height: 1.5; }
+.safety { font-size: 12px; line-height: 1.6; color: #66562f; padding: 0 4px; }
+footer { text-align: center; color: #748075; font-size: 12px; padding: 8px 16px 28px; }
