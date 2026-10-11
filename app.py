@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 
 FRONTEND_ORIGIN = "https://cassava-crop-doctor.onrender.com"
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+BREWKEG_API_KEY = os.environ.get("BREWKEG_API_KEY", "")
+BREWKEG_MODEL = os.environ.get("BREWKEG_MODEL", "gemini-3-flash")
 
 # Basic in-memory limit to discourage accidental abuse.
 requests_by_ip = defaultdict(deque)
@@ -33,7 +33,7 @@ def health():
     return jsonify({
         "service": "Cassava Crop Doctor API",
         "status": "online",
-        "ai_configured": bool(GEMINI_API_KEY),
+        "ai_configured": bool(BREWKEG_API_KEY),
     })
 
 
@@ -42,7 +42,7 @@ def diagnose():
     if request.method == "OPTIONS":
         return "", 204
 
-    if not GEMINI_API_KEY:
+    if not BREWKEG_API_KEY:
         return jsonify({
             "error": "AI is not configured yet. Please try again later."
         }), 503
@@ -109,66 +109,78 @@ Make clear that this is a preliminary AI assessment, not a confirmed diagnosis.
 
     import base64
 
+    encoded_image = base64.b64encode(image_bytes).decode("ascii")
+    image_url = f"data:{mime_type};base64,{encoded_image}"
+
     payload = {
-        "contents": [{
-            "parts": [
-                {"text": prompt},
-                {"inline_data": {
-                    "mime_type": mime_type,
-                    "data": base64.b64encode(image_bytes).decode("ascii"),
-                }},
-            ]
-        }]
+        "model": BREWKEG_MODEL,
+        "messages": [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_url, "detail": "high"},
+                },
+            ],
+        }],
+        "max_tokens": 1200,
     }
 
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent"
-    )
+    url = "https://brewkeg.dev/v1/chat/completions"
 
     try:
         response = requests.post(
             url,
             headers={
-                "x-goog-api-key": GEMINI_API_KEY,
+                "Authorization": f"Bearer {BREWKEG_API_KEY}",
                 "Content-Type": "application/json",
             },
             json=payload,
             timeout=60,
         )
-    except requests.RequestException:
+    except requests.RequestException as exc:
+        app.logger.warning("BrewKeg connection failed: %s", type(exc).__name__)
         return jsonify({
             "error": "The AI service could not be reached. Please try again."
         }), 502
 
     if response.status_code != 200:
+        app.logger.warning(
+            "BrewKeg returned HTTP %s; response: %s",
+            response.status_code,
+            response.text[:500],
+        )
+        if response.status_code == 401:
+            return jsonify({
+                "error": "BrewKeg authentication failed. Check the API key in Render."
+            }), 502
+        if response.status_code == 402:
+            return jsonify({
+                "error": "BrewKeg needs account credit before the assessment can run."
+            }), 502
         if response.status_code == 429:
             return jsonify({
                 "error": "The AI service is busy or its request limit was reached. Please try later."
             }), 429
-        if response.status_code in (400, 403, 404):
-            app.logger.warning(
-                "AI provider returned HTTP %s; response: %s",
-                response.status_code,
-                response.text[:500],
-            )
-            return jsonify({
-                "error": "The AI model or API configuration needs checking."
-            }), 502
-        app.logger.warning(
-            "AI provider returned HTTP %s; response: %s",
-            response.status_code,
-            response.text[:500],
-        )
-        return jsonify({"error": "The AI assessment failed. Please try later."}), 502
+        return jsonify({
+            "error": "The AI assessment failed. Check the API service logs."
+        }), 502
 
     try:
         data = response.json()
-        parts = data["candidates"][0]["content"]["parts"]
-        answer = "\n".join(
-            part["text"] for part in parts if isinstance(part.get("text"), str)
-        ).strip()
+        answer = data["choices"][0]["message"]["content"]
+        if isinstance(answer, list):
+            answer = "\\n".join(
+                part.get("text", "")
+                for part in answer
+                if isinstance(part, dict) and isinstance(part.get("text"), str)
+            )
+        if not isinstance(answer, str):
+            answer = ""
+        answer = answer.strip()
     except (ValueError, KeyError, IndexError, TypeError):
+        app.logger.warning("BrewKeg returned an unreadable response.")
         return jsonify({
             "error": "The AI returned an unreadable result. Please try again."
         }), 502
